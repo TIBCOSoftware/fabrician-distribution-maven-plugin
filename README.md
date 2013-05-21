@@ -81,7 +81,7 @@ Upload one or more grid libraries to a running Silver Fabric Broker.
     <th>Name</th><th>Description</th><th>Default Value</th>
   </tr>
   <tr>
-    <td>brokerUrl</td><td>Silver Fabric Broker URL</td><td>http://localhost:8000/livecluster/gridlibs/archives</td>
+    <td>brokerUrl</td><td>Silver Fabric Broker URL.  For Silver Fabric 5.5, use http://localhost:8000/livecluster/rest/v1/sf/gridlibs/archives.</td><td>http://localhost:8000/livecluster/gridlibs/archives</td>
   </tr>
   <tr>
     <td>brokerUsername</td><td>Silver Fabric Broker user name</td><td>admin</td>
