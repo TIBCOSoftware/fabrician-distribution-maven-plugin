@@ -13,11 +13,11 @@
 		<url>https://github.com/fabrician/distribution-maven-plugin/issues</url>
 	</issueManagement>
 
-    <licenses>
-        <license>
-            <url>https://github.com/fabrician/distribution-maven-plugin/blob/master/LICENSE.txt</url>
-        </license>
-    </licenses>
+    	<licenses>
+        	<license>
+            		<url>https://github.com/fabrician/distribution-maven-plugin/blob/master/LICENSE.txt</url>
+        	</license>
+    	</licenses>
 	
 	<dependencies>
 		<dependency>
@@ -26,9 +26,9 @@
 			<version>2.0</version>
 		</dependency>
         <dependency>
-            <groupId>org.apache.maven.shared</groupId>
-            <artifactId>maven-shared-utils</artifactId>
-            <version>0.3</version>
+            	<groupId>org.apache.maven.shared</groupId>
+            	<artifactId>maven-shared-utils</artifactId>
+            	<version>0.3</version>
         </dependency>
 		<dependency>
 			<groupId>junit</groupId>
