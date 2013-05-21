@@ -1,4 +1,88 @@
-distribution-maven-plugin
-=========================
+[fabrician.org](http://fabrician.org/) - Distribution Maven Plugin
+==========================================================================
 
-Maven plugin for creating distributions and uploading grid libraries.
+Maven Plugin for creating distributions and uploading grid libraries to SilverFabric.
+
+Released builds are available from Maven Central.
+
+## Distribution Packaging
+
+`distribution:package`
+
+#### Full name:
+
+`org.fabrician.maven-plugins:distribution-plugin:1.0:package`
+
+#### Description:
+
+Packages a grid libary given the grid-library.xml resource directory and 3rd party directory or zip/tar.gz.
+
+#### Parameters:
+
+<table>
+  <tr>
+    <th>Name</th><th>Description</th><th>Default Value</th>
+  </tr>
+  <tr>
+    <td>distroFilename</td><td>The target name of the distribution grid library.  The extension must be tar.gz or zip.</td><td></td>
+  </tr>
+  <tr>
+    <td>distroSource</td><td>The file or directory that contains the software to bundle.</td><td></td>
+  </tr>
+  <tr>
+    <td>distroResources</td><td>The directory that contains the grid library resources such as a grid-library.xml.</td><td>src/main/resources/distribution</td>
+  </tr>
+  <tr>
+    <td>distroAlternateRootDirectory</td><td>The alternate root directory name in the resulting grid library.  Useful when the software zip or tar.gz basedir changes across versions.  For example, a.zip:foo/bar/x.html -> b.tar.gz:myAltDir/bar/x.html when distroAlternateRootDirectory is set to myAltDir.</td><td></td>
+  </tr>
+</table>
+
+#### Example:
+
+```xml
+<plugin>
+    <groupId>org.fabrician.maven-plugins</groupId>
+    <artifactId>distribution-plugin</artifactId>
+    <version>1.0</version>
+    <executions>
+        <execution>
+            <id>package-distribution</id>
+            <phase>package</phase>
+            <goals>
+                <goal>package</goal>
+            </goals>
+            <configuration>
+                <distroSource>/tmp/apache-activemq-5.7.0-bin.zip</distroSource>
+                <distroFilename>${project.build.directory}/active-mq-5.7.0-distro.tar.gz</distroFilename>
+                <gridlibFilename>${project.build.directory}/active-mq-1.0-SNAPSHOT.tar.gz</gridlibFilename>
+                <distroAlternateRootDirectory>apache-activemq</distroAlternateRootDirectory>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+```
+
+## Grid Library Upload
+
+```xml
+<plugin>
+    <groupId>org.fabrician.maven-plugins</groupId>
+    <artifactId>distribution-plugin</artifactId>
+    <version>1.0</version>
+    <executions>
+    <plugin> 
+        <execution>
+             <id>upload-gridlibs</id>
+            <phase>install</phase>
+            <goals>
+                <goal>upload</goal>
+            </goals>
+            <configuration>
+                 <includes>
+                     <include>*.tar.gz</include>
+                 </includes>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+```
