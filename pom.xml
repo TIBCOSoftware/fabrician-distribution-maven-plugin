@@ -13,12 +13,26 @@
 		<url>https://github.com/fabrician/distribution-maven-plugin/issues</url>
 	</issueManagement>
 
+	<scm>
+		<url>https://github.com/fabrician/distribution-maven-plugin</url>
+		<connection>scm:git:git://github.com/fabrician/distribution-maven-plugin.git</connection>
+	</scm>
+
     	<licenses>
         	<license>
             		<url>https://github.com/fabrician/distribution-maven-plugin/blob/master/LICENSE.txt</url>
         	</license>
     	</licenses>
 	
+    	<developers>
+        	<developer>
+            		<email>bengel@tibco.com</email>
+            		<name>Bryan Engel</name>
+            		<url>https://github.com/bryanvbengel</url>
+            		<id>bryanvbengel</id>
+        	</developer>
+    	</developers>
+    	
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.maven</groupId>
