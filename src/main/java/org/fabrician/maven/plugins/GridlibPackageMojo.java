@@ -18,7 +18,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
 /**
- * Goal that packages a grid library.
+ * Packages a grid libary given the grid-library.xml resource directory and 3rd party directory or zip/tar.gz.
  *
  * @goal package
  * 
@@ -27,7 +27,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 public class GridlibPackageMojo extends AbstractMojo {
     
     /**
-    * Grid library filename
+    * The target name of the distribution grid library.  The extension must be tar.gz or zip.
     * @required
     * @parameter
     *   expression="${distroFilename}"
@@ -36,7 +36,7 @@ public class GridlibPackageMojo extends AbstractMojo {
     private File distroFilename;
     
     /**
-    * The file or directory that contains the software to bundle
+    * The file or directory that contains the software to bundle.
     * @required
     * @parameter
     *   expression="${distroSource}"
