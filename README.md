@@ -64,6 +64,47 @@ Packages a grid libary given the grid-library.xml resource directory and 3rd par
 
 ## Grid Library Upload
 
+`distribution:upload`
+
+#### Full name:
+
+`org.fabrician.maven-plugins:distribution-plugin:1.0:upload`
+
+#### Description:
+
+Upload one or more grid libraries to a running Silver Fabric Broker.
+
+#### Parameters:
+
+<table>
+  <tr>
+    <th>Name</th><th>Description</th><th>Default Value</th>
+  </tr>
+  <tr>
+    <td>brokerUrl</td><td>Silver Fabric Broker URL</td><td>http://localhost:8000/livecluster/gridlibs/archives</td>
+  </tr>
+  <tr>
+    <td>brokerUsername</td><td>Silver Fabric Broker user name</td><td>admin</td>
+  </tr>
+  <tr>
+    <td>brokerPassword</td><td>Silver Fabric Broker password</td><td>admin</td>
+  </tr>
+  <tr>
+    <td>serverId</td><td>Which server credentials to use from the user's settings.xml.  This hasn't been implemented.</td><td></td>
+  </tr>
+  <tr>
+    <td>gridlibOverwrite</td><td>Overwrite the grid libary if it already exists.</td><td>false</td>
+  </tr>
+  <tr>
+    <td>includes</td><td>A set of file patterns to include in the upload.</td><td></td>
+  </tr>
+  <tr>
+    <td>excludes</td><td>A set of file patterns to exclude from the upload.</td><td></td>
+  </tr>
+</table>
+
+#### Example:
+
 ```xml
 <plugin>
     <groupId>org.fabrician.maven-plugins</groupId>
@@ -72,7 +113,7 @@ Packages a grid libary given the grid-library.xml resource directory and 3rd par
     <executions>
     <plugin> 
         <execution>
-             <id>upload-gridlibs</id>
+            <id>upload-gridlibs</id>
             <phase>install</phase>
             <goals>
                 <goal>upload</goal>
