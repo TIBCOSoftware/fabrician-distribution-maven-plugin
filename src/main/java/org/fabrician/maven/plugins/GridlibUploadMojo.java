@@ -27,7 +27,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.shared.utils.io.DirectoryScanner;
 
 /**
- * Goal that uploads a grid library to a Silver Fabric Broker
+ * Upload one or more grid libraries to a running Silver Fabric Broker.
  *
  * @goal upload
  * 
