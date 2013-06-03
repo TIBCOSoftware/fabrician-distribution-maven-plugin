@@ -1,9 +1,11 @@
-[fabrician.org](http://fabrician.org/) - Distribution Maven Plugin
+[fabrician.org](http://fabrician.org/)
+==========================================================================
+Distribution Maven Plugin
 ==========================================================================
 
 Maven Plugin for creating distributions and uploading grid libraries to SilverFabric.
 
-Released builds are available from Maven Central.
+Released builds are not yet available from Maven Central.
 
 ## Distribution Packaging
 
