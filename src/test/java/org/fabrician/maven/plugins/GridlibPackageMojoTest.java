@@ -7,7 +7,9 @@
 package org.fabrician.maven.plugins;
 
 import java.io.File;
+import java.util.Properties;
 
+import org.apache.maven.project.MavenProject;
 import org.junit.Test;
 
 public class GridlibPackageMojoTest {
@@ -21,7 +23,8 @@ public class GridlibPackageMojoTest {
         GridlibPackageMojo packager = new GridlibPackageMojo(target, 
                 new File(resourceDir, "test.tar.gz"),
                 new File(resourceDir, "distribution"), 
-                null);
+                null,
+                new MyMavenProject());
         packager.execute();
         assert(target.exists());
 
@@ -29,7 +32,8 @@ public class GridlibPackageMojoTest {
         packager = new GridlibPackageMojo(target, 
                 new File(resourceDir, "test.tar.gz"),
                 new File(resourceDir, "distribution"), 
-                "myAltDir");
+                "myAltDir",
+                new MyMavenProject());
         packager.execute();
         assert(target.exists());
     }
@@ -40,7 +44,8 @@ public class GridlibPackageMojoTest {
         GridlibPackageMojo packager = new GridlibPackageMojo(target, 
                 new File(resourceDir, "test.tar.gz"),
                 new File(resourceDir, "distribution"),
-                null);
+                null,
+                new MyMavenProject());
         packager.execute();
         assert(target.exists());
         
@@ -48,7 +53,8 @@ public class GridlibPackageMojoTest {
         packager = new GridlibPackageMojo(target, 
                 new File(resourceDir, "test.tar.gz"),
                 new File(resourceDir, "distribution"),
-                "myAltDir");
+                "myAltDir",
+                new MyMavenProject());
         packager.execute();
         assert(target.exists());
     }
@@ -59,7 +65,8 @@ public class GridlibPackageMojoTest {
         GridlibPackageMojo packager = new GridlibPackageMojo(target, 
                 new File(resourceDir, "test.tar.gz"),
                 new File(resourceDir, "distribution"),
-                null);
+                null,
+                new MyMavenProject());
         packager.execute();
         assert(target.exists());
         
@@ -67,7 +74,8 @@ public class GridlibPackageMojoTest {
         packager = new GridlibPackageMojo(target, 
                 new File(resourceDir, "test.tar.gz"),
                 new File(resourceDir, "distribution"),
-                "MyAltDir");
+                "MyAltDir",
+                new MyMavenProject());
         packager.execute();
         assert(target.exists());
     }
@@ -78,7 +86,8 @@ public class GridlibPackageMojoTest {
         GridlibPackageMojo packager = new GridlibPackageMojo(target, 
                 new File(resourceDir, "test.zip"),
                 new File(resourceDir, "distribution"),
-                null);
+                null,
+                new MyMavenProject());
         packager.execute();
         assert(target.exists());
         
@@ -86,7 +95,8 @@ public class GridlibPackageMojoTest {
         packager = new GridlibPackageMojo(target, 
                 new File(resourceDir, "test.zip"),
                 new File(resourceDir, "distribution"),
-                "myAltDir");
+                "myAltDir",
+                new MyMavenProject());
         packager.execute();
         assert(target.exists());
     }
@@ -97,7 +107,8 @@ public class GridlibPackageMojoTest {
         GridlibPackageMojo packager = new GridlibPackageMojo(target, 
                 new File(resourceDir, "tmp"),
                 new File(resourceDir, "distribution"),
-                null);
+                null,
+                new MyMavenProject());
         packager.execute();
         assert(target.exists());
     }
@@ -108,8 +119,19 @@ public class GridlibPackageMojoTest {
         GridlibPackageMojo packager = new GridlibPackageMojo(target, 
                 new File(resourceDir, "tmp"),
                 new File(resourceDir, "distribution"),
-                null);
+                null,
+                new MyMavenProject());
         packager.execute();
         assert(target.exists());
+    }
+    
+    private class MyMavenProject extends MavenProject {
+        @Override
+        public Properties getProperties() {
+            Properties p = new Properties();
+            p.setProperty("distribution.version", "4.4.4.4");
+            p.setProperty("distribution.os", "TRS-DOS");
+            return p;
+        }
     }
 }

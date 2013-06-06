@@ -9,6 +9,7 @@ package org.fabrician.maven.plugins;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Properties;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
@@ -16,6 +17,7 @@ import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
 
 /**
  * Packages a grid libary given the grid-library.xml resource directory and 3rd party directory or zip/tar.gz.
@@ -61,21 +63,36 @@ public class GridlibPackageMojo extends AbstractMojo {
     */
     private String distroAlternateRootDirectory;
 
+    /**
+    * Whether to apply resource filter to the distroResources file set.
+    * @parameter
+    *   default-value="true"
+    */
+    private boolean filtered = true;
+    
+    /**
+    * @parameter default-value="${project}"
+    * @required
+    * @readonly
+    */
+    private MavenProject project;
+   
     public GridlibPackageMojo() {}
     
     // for tests only
-    public GridlibPackageMojo(File distroFilename, File distroSource, File distroResources, String distroAlternateRootDirectory) {
+    public GridlibPackageMojo(File distroFilename, File distroSource, File distroResources, String distroAlternateRootDirectory, MavenProject project) {
         this.distroFilename = distroFilename;
         this.distroSource = distroSource;
         this.distroResources = distroResources;
         this.distroAlternateRootDirectory = distroAlternateRootDirectory;
+        this.project = project;
     }
     
     public void execute() throws MojoExecutionException {
         if (!distroSource.exists()) {
             throw new MojoExecutionException(distroSource + " does not exist");
         }
-        
+
         if (CompressUtils.isZip(distroFilename)) {
             createZip();
         } else if (CompressUtils.isTargz(distroFilename)) {
@@ -100,7 +117,11 @@ public class GridlibPackageMojo extends AbstractMojo {
                 throw new MojoExecutionException("Unspported source type: " + distroSource);
             }
             if (distroResources != null && !"".equals(distroResources)) {
-                CompressUtils.copyDirToArchiveOutputStream(distroResources, out);
+                if (filtered) {
+                    CompressUtils.copyFilteredDirToArchiveOutputStream(distroResources, getFilterProperties(), out);
+                } else {
+                    CompressUtils.copyDirToArchiveOutputStream(distroResources, out);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -130,7 +151,11 @@ public class GridlibPackageMojo extends AbstractMojo {
                 throw new MojoExecutionException("Unspported source type: " + distroSource);
             }
             if (distroResources != null && !"".equals(distroResources)) {
-                CompressUtils.copyDirToArchiveOutputStream(distroResources, tout);
+                if (filtered) {
+                    CompressUtils.copyFilteredDirToArchiveOutputStream(distroResources, getFilterProperties(), tout);
+                } else {
+                    CompressUtils.copyDirToArchiveOutputStream(distroResources, tout);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -140,5 +165,14 @@ public class GridlibPackageMojo extends AbstractMojo {
             CompressUtils.close(cout);
             CompressUtils.close(out);
         }
+    }
+    
+    private Properties getFilterProperties() {
+        Properties props = null;
+        // just the user supplied for now
+        if (project != null && filtered) {
+            props = project.getProperties();
+        }
+        return props;
     }
 }

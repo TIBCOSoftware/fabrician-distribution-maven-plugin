@@ -6,12 +6,16 @@
  */
 package org.fabrician.maven.plugins;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Enumeration;
+import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveOutputStream;
@@ -74,6 +78,50 @@ public class CompressUtils {
         }
     }
     
+    /**
+     * This attempts to mimic the filtering in the maven-assembly-plugin at a basic level.  It wasn't clear how to use the archivers directly 
+     * in that plugin.
+     * Supports ${x} only.
+     */
+    public static void copyFilteredDirToArchiveOutputStream(File baseDir, Properties replacements, ArchiveOutputStream out) throws IOException {
+        File[] files = baseDir.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                String contents = transform(file, replacements);
+                ByteArrayInputStream in = new ByteArrayInputStream(contents.getBytes());
+                ArchiveEntry entry = null;
+                if (out instanceof TarArchiveOutputStream) {
+                    entry = new TarArchiveEntry(file.getName());
+                    ((TarArchiveEntry) entry).setSize(contents.getBytes().length);
+                    ((TarArchiveEntry) entry).setModTime(file.lastModified());
+                } else {
+                    entry = new ZipArchiveEntry(file.getName());
+                    ((ZipArchiveEntry)entry).setSize(contents.getBytes().length);
+                    ((ZipArchiveEntry)entry).setTime(file.lastModified());
+                }
+                out.putArchiveEntry(entry);
+                IOUtils.copy(in, out);
+                out.closeArchiveEntry();
+            }
+        }
+    }
+        
+    private static String transform(File f, Properties p) throws IOException {
+        FileInputStream fis = null;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            fis = new FileInputStream(f);
+            IOUtils.copy(fis, baos);
+        } finally {
+            close(fis);
+        }
+        String contents = new String(baos.toByteArray());
+        for (Entry<Object, Object> entry : p.entrySet()) {
+            contents = contents.replaceAll("\\$\\{" + entry.getKey() + "}", String.valueOf(entry.getValue()));
+        }
+        return contents;
+    }
+    
     public static void copyDirToArchiveOutputStream(File baseDir, ArchiveOutputStream out) throws IOException {
         File[] files = baseDir.listFiles();
         if (files != null) {
@@ -90,7 +138,7 @@ public class CompressUtils {
             }
         }
     }
-
+    
     public static void close(OutputStream out) {
         try {
             out.close();
