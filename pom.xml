@@ -3,7 +3,7 @@
 	<groupId>org.fabrician.maven-plugins</groupId>
 	<artifactId>distribution-plugin</artifactId>
 	<packaging>maven-plugin</packaging>
-	<version>1.1-SNAPSHOT</version>
+	<version>1.1</version>
 
 	<name>Maven Plugin for SilverFabric Distributions</name>
 	<description>Maven Plugin for creating distributions and uploading grid libraries.</description>
@@ -23,7 +23,8 @@
 		<url>https://github.com/fabrician/distribution-maven-plugin</url>
 		<connection>scm:git:https://github.com/fabrician/distribution-maven-plugin.git</connection>
 		<developerConnection>scm:git:https://github.com/fabrician/distribution-maven-plugin.git</developerConnection>
-	</scm>
+	  <tag>distribution-plugin-1.1</tag>
+  </scm>
 
 	<licenses>
 		<license>
