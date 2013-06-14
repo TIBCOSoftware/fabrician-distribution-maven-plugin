@@ -22,6 +22,7 @@
 	<scm>
 		<url>https://github.com/fabrician/distribution-maven-plugin</url>
 		<connection>scm:git:git://github.com/fabrician/distribution-maven-plugin.git</connection>
+		<developerConnection>scm:git:git://github.com/fabrician/distribution-maven-plugin.git</developerConnection>
 	</scm>
 
 	<licenses>
