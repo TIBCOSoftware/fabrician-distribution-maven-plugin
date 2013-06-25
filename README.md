@@ -46,6 +46,12 @@ Packages a grid libary given the grid-library.xml resource directory and 3rd par
     <groupId>org.fabrician.maven-plugins</groupId>
     <artifactId>distribution-plugin</artifactId>
     <version>1.1</version>
+    <configuration>
+        <distroSource>/tmp/apache-activemq-5.7.0-bin.zip</distroSource>
+        <distroFilename>${project.build.directory}/active-mq-5.7.0-distro.tar.gz</distroFilename>
+        <distroResources>src/main/resources/distribution</distroResources>
+        <distroAlternateRootDirectory>apache-activemq</distroAlternateRootDirectory>
+    </configuration>
     <executions>
         <execution>
             <id>package-distribution</id>
@@ -53,12 +59,6 @@ Packages a grid libary given the grid-library.xml resource directory and 3rd par
             <goals>
                 <goal>package</goal>
             </goals>
-            <configuration>
-                <distroSource>/tmp/apache-activemq-5.7.0-bin.zip</distroSource>
-                <distroFilename>${project.build.directory}/active-mq-5.7.0-distro.tar.gz</distroFilename>
-                <distroResources>src/main/resources/distribution</distroResources>
-                <distroAlternateRootDirectory>apache-activemq</distroAlternateRootDirectory>
-            </configuration>
         </execution>
     </executions>
 </plugin>
