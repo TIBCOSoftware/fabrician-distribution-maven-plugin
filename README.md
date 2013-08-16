@@ -23,7 +23,7 @@ Packages a grid libary given the grid-library.xml resource directory and 3rd par
 
 <table>
   <tr>
-    <th>Name</th><th>Description</th><th>Default Value</th><th>Plugin Version</th>
+    <th>Name</th><th>Description</th><th>Default Value</th><th>Version Added</th>
   </tr>
   <tr>
     <td>distroFilename</td><td>The target name of the distribution grid library.  The extension must be tar.gz or zip.</td><td></td><td>1.0</td>
@@ -86,7 +86,7 @@ Upload one or more grid libraries to a running Silver Fabric Broker.
 
 <table>
   <tr>
-    <th>Name</th><th>Description</th><th>Default Value</th><th>Plugin Version</th>
+    <th>Name</th><th>Description</th><th>Default Value</th><th>Version Added</th>
   </tr>
   <tr>
     <td>brokerUrl</td><td>Silver Fabric Broker URL.  For Silver Fabric 5.5, use http://localhost:8000/livecluster/rest/v1/sf/gridlibs/archives.</td><td>http://localhost:8000/livecluster/gridlibs/archives</td><td>1.0</td>
