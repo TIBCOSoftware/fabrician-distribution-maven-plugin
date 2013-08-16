@@ -9,7 +9,9 @@ package org.fabrician.maven.plugins;
 import java.io.File;
 import java.util.Properties;
 
+
 import org.apache.maven.project.MavenProject;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class GridlibPackageMojoTest {
@@ -22,20 +24,24 @@ public class GridlibPackageMojoTest {
         File target = new File(tmpDir, "targzToZip.zip");
         GridlibPackageMojo packager = new GridlibPackageMojo(target, 
                 new File(resourceDir, "test.tar.gz"),
+                null,
+                null,
                 new File(resourceDir, "distribution"), 
                 null,
                 new MyMavenProject());
         packager.execute();
-        assert(target.exists());
+        Assert.assertTrue(target + " doesn't exist", target.exists());
 
         target = new File(tmpDir, "targzToZipAlt.zip");
         packager = new GridlibPackageMojo(target, 
                 new File(resourceDir, "test.tar.gz"),
+                null,
+                null,
                 new File(resourceDir, "distribution"), 
                 "myAltDir",
                 new MyMavenProject());
         packager.execute();
-        assert(target.exists());
+        Assert.assertTrue(target + " doesn't exist", target.exists());
     }
 
     @Test
@@ -43,20 +49,35 @@ public class GridlibPackageMojoTest {
         File target = new File(tmpDir, "targzToTargz.tar.gz");
         GridlibPackageMojo packager = new GridlibPackageMojo(target, 
                 new File(resourceDir, "test.tar.gz"),
+                null,
+                null,
                 new File(resourceDir, "distribution"),
                 null,
                 new MyMavenProject());
         packager.execute();
-        assert(target.exists());
+        Assert.assertTrue(target + " doesn't exist", target.exists());
         
         target = new File(tmpDir, "targzToTargzAlt.tar.gz");
         packager = new GridlibPackageMojo(target, 
                 new File(resourceDir, "test.tar.gz"),
+                null,
+                null,
                 new File(resourceDir, "distribution"),
                 "myAltDir",
                 new MyMavenProject());
         packager.execute();
-        assert(target.exists());
+        Assert.assertTrue(target + " doesn't exist", target.exists());
+
+        target = new File(tmpDir, "targzToTargzAlt2.tar.gz");
+        packager = new GridlibPackageMojo(target, 
+                new File(resourceDir, "test.tar.gz"),
+                null,
+                new String[] { "**\\myOldDir\\*" },
+                new File(resourceDir, "distribution"),
+                "myAltDir",
+                new MyMavenProject());
+        packager.execute();
+        Assert.assertTrue(target + " doesn't exist", target.exists());
     }
 
     @Test
@@ -64,20 +85,35 @@ public class GridlibPackageMojoTest {
         File target = new File(tmpDir, "zipToTargz.tar.gz");
         GridlibPackageMojo packager = new GridlibPackageMojo(target, 
                 new File(resourceDir, "test.tar.gz"),
+                null,
+                null,
                 new File(resourceDir, "distribution"),
                 null,
                 new MyMavenProject());
         packager.execute();
-        assert(target.exists());
+        Assert.assertTrue(target + " doesn't exist", target.exists());
         
         target = new File(tmpDir, "zipToTargzAlt.tar.gz");
         packager = new GridlibPackageMojo(target, 
                 new File(resourceDir, "test.tar.gz"),
+                null,
+                null,
                 new File(resourceDir, "distribution"),
                 "MyAltDir",
                 new MyMavenProject());
         packager.execute();
-        assert(target.exists());
+        Assert.assertTrue(target + " doesn't exist", target.exists());
+        
+        target = new File(tmpDir, "zipToTargzAlt2.tar.gz");
+        packager = new GridlibPackageMojo(target, 
+                new File(resourceDir, "test.tar.gz"),
+                null,
+                new String[] { "**\\myOldDir\\*" },
+                new File(resourceDir, "distribution"),
+                "MyAltDir",
+                new MyMavenProject());
+        packager.execute();
+        Assert.assertTrue(target + " doesn't exist", target.exists());
     }
 
     @Test
@@ -85,20 +121,24 @@ public class GridlibPackageMojoTest {
         File target = new File(tmpDir, "zipToZip.zip");
         GridlibPackageMojo packager = new GridlibPackageMojo(target, 
                 new File(resourceDir, "test.zip"),
+                null,
+                null,
                 new File(resourceDir, "distribution"),
                 null,
                 new MyMavenProject());
         packager.execute();
-        assert(target.exists());
+        Assert.assertTrue(target + " doesn't exist", target.exists());
         
         target = new File(tmpDir, "zipToZipAlt.zip");
         packager = new GridlibPackageMojo(target, 
                 new File(resourceDir, "test.zip"),
+                null,
+                null,
                 new File(resourceDir, "distribution"),
                 "myAltDir",
                 new MyMavenProject());
         packager.execute();
-        assert(target.exists());
+        Assert.assertTrue(target + " doesn't exist", target.exists());
     }
     
     @Test
@@ -106,11 +146,13 @@ public class GridlibPackageMojoTest {
         File target = new File(tmpDir, "dirToZip.zip");
         GridlibPackageMojo packager = new GridlibPackageMojo(target, 
                 new File(resourceDir, "tmp"),
+                null,
+                null,
                 new File(resourceDir, "distribution"),
                 null,
                 new MyMavenProject());
         packager.execute();
-        assert(target.exists());
+        Assert.assertTrue(target + " doesn't exist", target.exists());
     }
     
     @Test
@@ -118,11 +160,13 @@ public class GridlibPackageMojoTest {
         File target = new File(tmpDir, "dirToTargz.tar.gz");
         GridlibPackageMojo packager = new GridlibPackageMojo(target, 
                 new File(resourceDir, "tmp"),
+                null,
+                null,
                 new File(resourceDir, "distribution"),
                 null,
                 new MyMavenProject());
         packager.execute();
-        assert(target.exists());
+        Assert.assertTrue(target + " doesn't exist", target.exists());
     }
     
     private class MyMavenProject extends MavenProject {

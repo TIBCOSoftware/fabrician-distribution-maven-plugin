@@ -69,6 +69,18 @@ public class GridlibPackageMojo extends AbstractMojo {
     *   default-value="true"
     */
     private boolean filtered = true;
+
+    /**
+    * A set of file patterns to include from the distribution package.
+    * @parameter alias="includes"
+    */
+    private String[] mIncludes;
+    
+    /**
+    * A set of file patterns to exclude from the distribution package.
+    * @parameter alias="excludes"
+    */
+    private String[] mExcludes;
     
     /**
     * @parameter default-value="${project}"
@@ -80,39 +92,49 @@ public class GridlibPackageMojo extends AbstractMojo {
     public GridlibPackageMojo() {}
     
     // for tests only
-    public GridlibPackageMojo(File distroFilename, File distroSource, File distroResources, String distroAlternateRootDirectory, MavenProject project) {
+    public GridlibPackageMojo(File distroFilename, File distroSource, String[] includes, String[] excludes, File distroResources, String distroAlternateRootDirectory, MavenProject project) {
         this.distroFilename = distroFilename;
         this.distroSource = distroSource;
+        this.mIncludes = includes;
+        this.mExcludes = excludes;
         this.distroResources = distroResources;
         this.distroAlternateRootDirectory = distroAlternateRootDirectory;
         this.project = project;
+    }
+
+    public void setIncludes(String[] includes) { 
+        mIncludes = includes; 
+    }
+    
+    public void setExcludes(String[] excludes) { 
+        mExcludes = excludes; 
     }
     
     public void execute() throws MojoExecutionException {
         if (!distroSource.exists()) {
             throw new MojoExecutionException(distroSource + " does not exist");
         }
-
+        FilenamePatternFilter filter = new FilenamePatternFilter(mIncludes, mExcludes);
         if (CompressUtils.isZip(distroFilename)) {
-            createZip();
+            createZip(filter);
         } else if (CompressUtils.isTargz(distroFilename)) {
-            createTar();
+            createTar(filter);
         } else {
             throw new MojoExecutionException("unsupported grid library extension: " + distroFilename);
         }
     }
     
-    private void createZip() throws MojoExecutionException {
+    private void createZip(FilenamePatternFilter filter) throws MojoExecutionException {
         distroFilename.getParentFile().mkdirs();
         ZipArchiveOutputStream out = null;
         try {
             out = new ZipArchiveOutputStream(distroFilename);
             if (distroSource.isDirectory()) {
-                CompressUtils.copyDirToArchiveOutputStream(distroSource, out);
+                CompressUtils.copyDirToArchiveOutputStream(distroSource, filter, out);
             } else if (CompressUtils.isZip(distroSource)) {
-                CompressUtils.copyZipToArchiveOutputStream(distroSource, out, distroAlternateRootDirectory);
+                CompressUtils.copyZipToArchiveOutputStream(distroSource, filter, out, distroAlternateRootDirectory);
             } else if (CompressUtils.isTargz(distroSource)) {
-                CompressUtils.copyTargzToArchiveOutputStream(distroSource, out, distroAlternateRootDirectory);
+                CompressUtils.copyTargzToArchiveOutputStream(distroSource, filter, out, distroAlternateRootDirectory);
             } else {
                 throw new MojoExecutionException("Unspported source type: " + distroSource);
             }
@@ -131,7 +153,7 @@ public class GridlibPackageMojo extends AbstractMojo {
         }
     }
     
-    private void createTar() throws MojoExecutionException {
+    private void createTar(FilenamePatternFilter filter) throws MojoExecutionException {
         distroFilename.getParentFile().mkdirs();
         FileOutputStream out = null;
         CompressorOutputStream cout = null;
@@ -142,11 +164,11 @@ public class GridlibPackageMojo extends AbstractMojo {
             tout = new TarArchiveOutputStream(cout);
             tout.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
             if (distroSource.isDirectory()) {
-                CompressUtils.copyDirToArchiveOutputStream(distroSource, tout);
+                CompressUtils.copyDirToArchiveOutputStream(distroSource, filter, tout);
             } else if (CompressUtils.isZip(distroSource)) {
-                CompressUtils.copyZipToArchiveOutputStream(distroSource, tout, distroAlternateRootDirectory);
+                CompressUtils.copyZipToArchiveOutputStream(distroSource, filter, tout, distroAlternateRootDirectory);
             } else if (CompressUtils.isTargz(distroSource)) {
-                CompressUtils.copyTargzToArchiveOutputStream(distroSource, tout, distroAlternateRootDirectory);
+                CompressUtils.copyTargzToArchiveOutputStream(distroSource, filter, tout, distroAlternateRootDirectory);
             } else {
                 throw new MojoExecutionException("Unspported source type: " + distroSource);
             }

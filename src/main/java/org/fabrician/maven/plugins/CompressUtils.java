@@ -39,9 +39,16 @@ public class CompressUtils {
     }
 
     public static void copyZipToArchiveOutputStream(File zipSrc, ArchiveOutputStream out, String alternateBaseDir) throws IOException {
+        copyZipToArchiveOutputStream(zipSrc, out, alternateBaseDir);
+    }
+    public static void copyZipToArchiveOutputStream(File zipSrc, FilenamePatternFilter filter, ArchiveOutputStream out, String alternateBaseDir) throws IOException {
         ZipFile zip = new ZipFile(zipSrc);
         for (Enumeration<ZipArchiveEntry> zipEnum = zip.getEntries(); zipEnum.hasMoreElements(); ) {
             ZipArchiveEntry source = zipEnum.nextElement();
+            if (filter != null && !filter.accept(source.getName())) {
+                System.out.print("Excluding " + source.getName());
+                continue;
+            }
             InputStream in = null;
             try {
                 in = zip.getInputStream(source);
@@ -55,6 +62,9 @@ public class CompressUtils {
     }
 
     public static void copyTargzToArchiveOutputStream(File targzSrc, ArchiveOutputStream out, String alternateBaseDir) throws IOException {
+        copyTargzToArchiveOutputStream(targzSrc, null, out, alternateBaseDir);
+    }
+    public static void copyTargzToArchiveOutputStream(File targzSrc, FilenamePatternFilter filter, ArchiveOutputStream out, String alternateBaseDir) throws IOException {
         FileInputStream fin = null;
         CompressorInputStream zipIn = null;
         TarArchiveInputStream tarIn = null;
@@ -64,9 +74,13 @@ public class CompressUtils {
             tarIn = new TarArchiveInputStream(zipIn);
             TarArchiveEntry entry = tarIn.getNextTarEntry();
             while (entry != null) {
-                out.putArchiveEntry(createArchiveEntry(entry, out, alternateBaseDir));
-                IOUtils.copy(tarIn, out);
-                out.closeArchiveEntry();
+                if (filter != null && !filter.accept(entry.getName())) {
+                    System.out.print("Excluding " + entry.getName());
+                } else {
+                    out.putArchiveEntry(createArchiveEntry(entry, out, alternateBaseDir));
+                    IOUtils.copy(tarIn, out);
+                    out.closeArchiveEntry();
+                }
                 entry = tarIn.getNextTarEntry();
             }
         } catch (Exception e) {
@@ -121,11 +135,18 @@ public class CompressUtils {
         }
         return contents;
     }
-    
+
     public static void copyDirToArchiveOutputStream(File baseDir, ArchiveOutputStream out) throws IOException {
+        copyDirToArchiveOutputStream(baseDir, null, out);
+    }
+    public static void copyDirToArchiveOutputStream(File baseDir, FilenamePatternFilter filter, ArchiveOutputStream out) throws IOException {
         File[] files = baseDir.listFiles();
         if (files != null) {
             for (File file : files) {
+                if (filter != null && !filter.accept(file.toString())) {
+                    System.out.print("Excluding " + file);
+                    continue;
+                }
                 FileInputStream fis = null;
                 try {
                     fis = new FileInputStream(file);
