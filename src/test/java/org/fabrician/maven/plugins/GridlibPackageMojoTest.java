@@ -9,7 +9,6 @@ package org.fabrician.maven.plugins;
 import java.io.File;
 import java.util.Properties;
 
-
 import org.apache.maven.project.MavenProject;
 import org.junit.Assert;
 import org.junit.Test;
@@ -153,6 +152,7 @@ public class GridlibPackageMojoTest {
                 new MyMavenProject());
         packager.execute();
         Assert.assertTrue(target + " doesn't exist", target.exists());
+        Assert.assertTrue("foo/dir_file.txt doesn't exist in " + target, CompressUtils.entryExistsInZip(target, "foo/dir_file.txt"));
     }
     
     @Test
@@ -167,6 +167,7 @@ public class GridlibPackageMojoTest {
                 new MyMavenProject());
         packager.execute();
         Assert.assertTrue(target + " doesn't exist", target.exists());
+        Assert.assertTrue("foo/dir_file.txt doesn't exist in " + target, CompressUtils.entryExistsInTargz(target, "foo/dir_file.txt"));
     }
     
     private class MyMavenProject extends MavenProject {

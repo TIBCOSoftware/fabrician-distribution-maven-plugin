@@ -37,7 +37,7 @@ public class CompressUtils {
     public static boolean isTargz(File f) {
         return f.getName().endsWith("tar.gz");
     }
-
+    
     public static void copyZipToArchiveOutputStream(File zipSrc, ArchiveOutputStream out, String alternateBaseDir) throws IOException {
         copyZipToArchiveOutputStream(zipSrc, out, alternateBaseDir);
     }
@@ -136,28 +136,75 @@ public class CompressUtils {
         return contents;
     }
 
-    public static void copyDirToArchiveOutputStream(File baseDir, ArchiveOutputStream out) throws IOException {
-        copyDirToArchiveOutputStream(baseDir, null, out);
+    public static void copyDirToArchiveOutputStream(File baseDir, ArchiveOutputStream out, String alternateBaseDir) throws IOException {
+        copyDirToArchiveOutputStream(baseDir, null, out, alternateBaseDir);
     }
-    public static void copyDirToArchiveOutputStream(File baseDir, FilenamePatternFilter filter, ArchiveOutputStream out) throws IOException {
+    public static void copyDirToArchiveOutputStream(File baseDir, FilenamePatternFilter filter, ArchiveOutputStream out, String alternateBaseDir) throws IOException {
+        copyDirToArchiveOutputStream("", baseDir, filter, out, alternateBaseDir);
+    }
+    private static void copyDirToArchiveOutputStream(String path, File baseDir, FilenamePatternFilter filter, ArchiveOutputStream out, String alternateBaseDir) throws IOException {
         File[] files = baseDir.listFiles();
         if (files != null) {
             for (File file : files) {
-                if (filter != null && !filter.accept(file.toString())) {
-                    System.out.print("Excluding " + file);
+                String entryName = path + (path.length() == 0 ? "" : "/") + file.getName();
+                if (filter != null && !filter.accept(entryName)) {
+                    System.out.print("Excluding " + entryName);
                     continue;
                 }
-                FileInputStream fis = null;
-                try {
-                    fis = new FileInputStream(file);
-                    out.putArchiveEntry(createArchiveEntry(file, out));
-                    IOUtils.copy(fis, out);
-                    out.closeArchiveEntry();
-                } finally {
-                    close(fis);
+                if (file.isDirectory()) {
+                    copyDirToArchiveOutputStream(entryName, file, filter, out, alternateBaseDir);
+                } else {
+                    FileInputStream fis = null;
+                    try {
+                        fis = new FileInputStream(file);
+                        out.putArchiveEntry(createArchiveEntry(file, entryName, out, alternateBaseDir));
+                        IOUtils.copy(fis, out);
+                        out.closeArchiveEntry();
+                    } finally {
+                        close(fis);
+                    }
                 }
             }
         }
+    }
+    
+    public static boolean entryExistsInTargz(File targz, String entryName) throws IOException {
+        FileInputStream fin = null;
+        CompressorInputStream zipIn = null;
+        TarArchiveInputStream tarIn = null;
+        boolean exists = false;
+        try {
+            fin = new FileInputStream(targz);
+            zipIn = new CompressorStreamFactory().createCompressorInputStream(CompressorStreamFactory.GZIP, fin);
+            tarIn = new TarArchiveInputStream(zipIn);
+            
+            TarArchiveEntry entry = tarIn.getNextTarEntry();
+            while (entry != null) {
+                if (entry.getName().equals(entryName)) {
+                    exists = true;
+                    break;
+                }
+                entry = tarIn.getNextTarEntry();
+            }
+        } catch (Exception e) {
+            throw new IOException(e);
+        } finally {
+            close(zipIn);
+            close(tarIn);
+            close(fin);
+        }
+        return exists;
+    }
+    
+    public static boolean entryExistsInZip(File zipFile, String entryName) throws IOException {
+        ZipFile zip = new ZipFile(zipFile);
+        for (Enumeration<ZipArchiveEntry> zipEnum = zip.getEntries(); zipEnum.hasMoreElements(); ) {
+            ZipArchiveEntry source = zipEnum.nextElement();
+            if (source.getName().equals(entryName)) {
+                return true;
+            }
+        }
+        return false;
     }
     
     public static void close(OutputStream out) {
@@ -202,16 +249,19 @@ public class CompressUtils {
         }
     }
     
-    private static ArchiveEntry createArchiveEntry(File f, OutputStream out) {
+    private static ArchiveEntry createArchiveEntry(File f, String name, OutputStream out, String alternateBaseDir) {
+        String substitutedName = substituteAlternateBaseDir(name, f.isDirectory(), alternateBaseDir);
         if (out instanceof TarArchiveOutputStream) {
-            return new TarArchiveEntry(f, f.getName());
+            return new TarArchiveEntry(f, substitutedName);
         } else {
-            return new ZipArchiveEntry(f, f.getName());
+            return new ZipArchiveEntry(f, substitutedName);
         }
     }
     
     private static String substituteAlternateBaseDir(ArchiveEntry entry, String alternateBaseDir) {
-        String name = entry.getName();
+        return substituteAlternateBaseDir(entry.getName(), entry.isDirectory(), alternateBaseDir);
+    }
+    private static String substituteAlternateBaseDir(String name, boolean isDirectory, String alternateBaseDir) {
         if (alternateBaseDir == null || "".equals(alternateBaseDir)) {
             return name;
         }
@@ -219,7 +269,7 @@ public class CompressUtils {
         String newName = name.replaceFirst(dirs[0], alternateBaseDir);
         
         if (dirs.length < 2) {
-            if (entry.isDirectory()) {
+            if (isDirectory) {
                 return newName;
             } else {
                 return name;

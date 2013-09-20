@@ -130,7 +130,7 @@ public class GridlibPackageMojo extends AbstractMojo {
         try {
             out = new ZipArchiveOutputStream(distroFilename);
             if (distroSource.isDirectory()) {
-                CompressUtils.copyDirToArchiveOutputStream(distroSource, filter, out);
+                CompressUtils.copyDirToArchiveOutputStream(distroSource, filter, out, distroAlternateRootDirectory);
             } else if (CompressUtils.isZip(distroSource)) {
                 CompressUtils.copyZipToArchiveOutputStream(distroSource, filter, out, distroAlternateRootDirectory);
             } else if (CompressUtils.isTargz(distroSource)) {
@@ -142,7 +142,7 @@ public class GridlibPackageMojo extends AbstractMojo {
                 if (filtered) {
                     CompressUtils.copyFilteredDirToArchiveOutputStream(distroResources, getFilterProperties(), out);
                 } else {
-                    CompressUtils.copyDirToArchiveOutputStream(distroResources, out);
+                    CompressUtils.copyDirToArchiveOutputStream(distroResources, out, distroAlternateRootDirectory);
                 }
             }
         } catch (IOException e) {
@@ -164,7 +164,7 @@ public class GridlibPackageMojo extends AbstractMojo {
             tout = new TarArchiveOutputStream(cout);
             tout.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
             if (distroSource.isDirectory()) {
-                CompressUtils.copyDirToArchiveOutputStream(distroSource, filter, tout);
+                CompressUtils.copyDirToArchiveOutputStream(distroSource, filter, tout, distroAlternateRootDirectory);
             } else if (CompressUtils.isZip(distroSource)) {
                 CompressUtils.copyZipToArchiveOutputStream(distroSource, filter, tout, distroAlternateRootDirectory);
             } else if (CompressUtils.isTargz(distroSource)) {
@@ -176,7 +176,7 @@ public class GridlibPackageMojo extends AbstractMojo {
                 if (filtered) {
                     CompressUtils.copyFilteredDirToArchiveOutputStream(distroResources, getFilterProperties(), tout);
                 } else {
-                    CompressUtils.copyDirToArchiveOutputStream(distroResources, tout);
+                    CompressUtils.copyDirToArchiveOutputStream(distroResources, tout, distroAlternateRootDirectory);
                 }
             }
         } catch (Exception e) {
