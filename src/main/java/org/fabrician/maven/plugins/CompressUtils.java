@@ -101,6 +101,9 @@ public class CompressUtils {
         File[] files = baseDir.listFiles();
         if (files != null) {
             for (File file : files) {
+                if (file.isDirectory()) {
+                    continue;
+                }
                 String contents = transform(file, replacements);
                 ByteArrayInputStream in = new ByteArrayInputStream(contents.getBytes());
                 ArchiveEntry entry = null;
