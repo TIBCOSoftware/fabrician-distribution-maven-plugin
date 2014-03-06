@@ -46,7 +46,7 @@ public class CompressUtils {
         for (Enumeration<ZipArchiveEntry> zipEnum = zip.getEntries(); zipEnum.hasMoreElements(); ) {
             ZipArchiveEntry source = zipEnum.nextElement();
             if (filter != null && !filter.accept(source.getName())) {
-                System.out.print("Excluding " + source.getName());
+                System.out.println("Excluding " + source.getName());
                 continue;
             }
             InputStream in = null;
@@ -75,7 +75,7 @@ public class CompressUtils {
             TarArchiveEntry entry = tarIn.getNextTarEntry();
             while (entry != null) {
                 if (filter != null && !filter.accept(entry.getName())) {
-                    System.out.print("Excluding " + entry.getName());
+                    System.out.println("Excluding " + entry.getName());
                 } else {
                     out.putArchiveEntry(createArchiveEntry(entry, out, alternateBaseDir));
                     IOUtils.copy(tarIn, out);
@@ -151,7 +151,7 @@ public class CompressUtils {
             for (File file : files) {
                 String entryName = path + (path.length() == 0 ? "" : "/") + file.getName();
                 if (filter != null && !filter.accept(entryName)) {
-                    System.out.print("Excluding " + entryName);
+                    System.out.println("Excluding " + entryName);
                     continue;
                 }
                 if (file.isDirectory()) {
