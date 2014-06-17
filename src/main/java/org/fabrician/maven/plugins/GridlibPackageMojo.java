@@ -9,12 +9,15 @@ package org.fabrician.maven.plugins;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Properties;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -38,13 +41,19 @@ public class GridlibPackageMojo extends AbstractMojo {
     private File distroFilename;
     
     /**
-    * The file or directory that contains the software to bundle.
+    * The file, URL or directory that contains the software to bundle.
     * @required
     * @parameter
     *   expression="${distroSource}"
     *   default-value=""
     */
-    private File distroSource;
+    private String distroSource;
+    
+    /**
+    * Base directory of the project.
+    * @parameter expression="${basedir}"
+    */
+    private File baseDirectory;
 
     /**
     * The directory that contains the grid library resources such as a grid-library.xml.
@@ -53,6 +62,20 @@ public class GridlibPackageMojo extends AbstractMojo {
     *   default-value="src/main/resources/distribution"
     */
     private File distroResources;
+
+    /**
+    * The connection timeout when downloading a URL distroSource.
+    * @parameter
+    *   default-value="60000"
+    */
+    private int connectionTimeout;
+    
+    /**
+    * The read timeout when downloading a URL distroSource.
+    * @parameter
+    *   default-value="60000"
+    */
+    private int readTimeout;
     
     /**
     * The alternate root directory name in the resulting grid library.  Useful when the software zip or tar.gz basedir changes
@@ -92,7 +115,7 @@ public class GridlibPackageMojo extends AbstractMojo {
     public GridlibPackageMojo() {}
     
     // for tests only
-    public GridlibPackageMojo(File distroFilename, File distroSource, String[] includes, String[] excludes, File distroResources, String distroAlternateRootDirectory, MavenProject project) {
+    public GridlibPackageMojo(File distroFilename, String distroSource, String[] includes, String[] excludes, File distroResources, String distroAlternateRootDirectory, MavenProject project) {
         this.distroFilename = distroFilename;
         this.distroSource = distroSource;
         this.mIncludes = includes;
@@ -111,30 +134,40 @@ public class GridlibPackageMojo extends AbstractMojo {
     }
     
     public void execute() throws MojoExecutionException {
-        if (!distroSource.exists()) {
-            throw new MojoExecutionException(distroSource + " does not exist");
+        File distroSourceFile;
+        if (isURL(distroSource)) {
+            try {
+                distroSourceFile = downloadFile(distroSource);
+            } catch (IOException e) {
+                throw new MojoExecutionException("Failed to download file from " + distroSource, e);
+            }
+        } else  {
+            distroSourceFile = new File(distroSource);
+            if (!distroSourceFile.exists()) {
+                throw new MojoExecutionException(distroSource + " does not exist");
+            }
         }
         FilenamePatternFilter filter = new FilenamePatternFilter(mIncludes, mExcludes);
         if (CompressUtils.isZip(distroFilename)) {
-            createZip(filter);
+            createZip(distroSourceFile, filter);
         } else if (CompressUtils.isTargz(distroFilename)) {
-            createTar(filter);
+            createTar(distroSourceFile, filter);
         } else {
             throw new MojoExecutionException("unsupported grid library extension: " + distroFilename);
         }
     }
     
-    private void createZip(FilenamePatternFilter filter) throws MojoExecutionException {
+    private void createZip(File distroSourceFile, FilenamePatternFilter filter) throws MojoExecutionException {
         distroFilename.getParentFile().mkdirs();
         ZipArchiveOutputStream out = null;
         try {
             out = new ZipArchiveOutputStream(distroFilename);
-            if (distroSource.isDirectory()) {
-                CompressUtils.copyDirToArchiveOutputStream(distroSource, filter, out, distroAlternateRootDirectory);
-            } else if (CompressUtils.isZip(distroSource)) {
-                CompressUtils.copyZipToArchiveOutputStream(distroSource, filter, out, distroAlternateRootDirectory);
-            } else if (CompressUtils.isTargz(distroSource)) {
-                CompressUtils.copyTargzToArchiveOutputStream(distroSource, filter, out, distroAlternateRootDirectory);
+            if (distroSourceFile.isDirectory()) {
+                CompressUtils.copyDirToArchiveOutputStream(distroSourceFile, filter, out, distroAlternateRootDirectory);
+            } else if (CompressUtils.isZip(distroSourceFile)) {
+                CompressUtils.copyZipToArchiveOutputStream(distroSourceFile, filter, out, distroAlternateRootDirectory);
+            } else if (CompressUtils.isTargz(distroSourceFile)) {
+                CompressUtils.copyTargzToArchiveOutputStream(distroSourceFile, filter, out, distroAlternateRootDirectory);
             } else {
                 throw new MojoExecutionException("Unspported source type: " + distroSource);
             }
@@ -153,7 +186,7 @@ public class GridlibPackageMojo extends AbstractMojo {
         }
     }
     
-    private void createTar(FilenamePatternFilter filter) throws MojoExecutionException {
+    private void createTar(File distroSourceFile, FilenamePatternFilter filter) throws MojoExecutionException {
         distroFilename.getParentFile().mkdirs();
         FileOutputStream out = null;
         CompressorOutputStream cout = null;
@@ -163,12 +196,12 @@ public class GridlibPackageMojo extends AbstractMojo {
             cout = new CompressorStreamFactory().createCompressorOutputStream(CompressorStreamFactory.GZIP, out);
             tout = new TarArchiveOutputStream(cout);
             tout.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
-            if (distroSource.isDirectory()) {
-                CompressUtils.copyDirToArchiveOutputStream(distroSource, filter, tout, distroAlternateRootDirectory);
-            } else if (CompressUtils.isZip(distroSource)) {
-                CompressUtils.copyZipToArchiveOutputStream(distroSource, filter, tout, distroAlternateRootDirectory);
-            } else if (CompressUtils.isTargz(distroSource)) {
-                CompressUtils.copyTargzToArchiveOutputStream(distroSource, filter, tout, distroAlternateRootDirectory);
+            if (distroSourceFile.isDirectory()) {
+                CompressUtils.copyDirToArchiveOutputStream(distroSourceFile, filter, tout, distroAlternateRootDirectory);
+            } else if (CompressUtils.isZip(distroSourceFile)) {
+                CompressUtils.copyZipToArchiveOutputStream(distroSourceFile, filter, tout, distroAlternateRootDirectory);
+            } else if (CompressUtils.isTargz(distroSourceFile)) {
+                CompressUtils.copyTargzToArchiveOutputStream(distroSourceFile, filter, tout, distroAlternateRootDirectory);
             } else {
                 throw new MojoExecutionException("Unspported source type: " + distroSource);
             }
@@ -187,6 +220,23 @@ public class GridlibPackageMojo extends AbstractMojo {
             CompressUtils.close(cout);
             CompressUtils.close(out);
         }
+    }
+    
+    private boolean isURL(String urlString) {
+        try {
+            new URL(urlString);
+        } catch (MalformedURLException e) {
+            return false;
+        }
+        return true;
+    }
+    
+    private File downloadFile(String urlString) throws IOException {
+        URL url = new URL(urlString);
+        getLog().info("Downloading " + url);
+        File destination = new File(baseDirectory, new File(url.getFile()).getName());
+        FileUtils.copyURLToFile(new URL(urlString), destination, connectionTimeout, readTimeout);
+        return destination;
     }
     
     private Properties getFilterProperties() {

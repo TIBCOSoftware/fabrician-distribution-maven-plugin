@@ -22,7 +22,7 @@ public class GridlibPackageMojoTest {
     public void targzToZip() throws Exception {
         File target = new File(tmpDir, "targzToZip.zip");
         GridlibPackageMojo packager = new GridlibPackageMojo(target, 
-                new File(resourceDir, "test.tar.gz"),
+                new File(resourceDir, "test.tar.gz").getAbsolutePath(),
                 null,
                 null,
                 new File(resourceDir, "distribution"), 
@@ -33,7 +33,7 @@ public class GridlibPackageMojoTest {
 
         target = new File(tmpDir, "targzToZipAlt.zip");
         packager = new GridlibPackageMojo(target, 
-                new File(resourceDir, "test.tar.gz"),
+                new File(resourceDir, "test.tar.gz").getAbsolutePath(),
                 null,
                 null,
                 new File(resourceDir, "distribution"), 
@@ -44,10 +44,35 @@ public class GridlibPackageMojoTest {
     }
 
     @Test
+    public void urlTargzToZip() throws Exception {
+        File target = new File(tmpDir, "urlTargzToZip.zip");
+        GridlibPackageMojo packager = new GridlibPackageMojo(target, 
+                "http://www.gtlib.gatech.edu/pub/apache//httpd/binaries/netware/httpd_2.0.65-netware-bin.zip",
+                null,
+                null,
+                new File(resourceDir, "distribution"), 
+                null,
+                new MyMavenProject());
+        packager.execute();
+        Assert.assertTrue(target + " doesn't exist", target.exists());
+
+        target = new File(tmpDir, "targzToZipAlt.zip");
+        packager = new GridlibPackageMojo(target, 
+                new File(resourceDir, "test.tar.gz").getAbsolutePath(),
+                null,
+                null,
+                new File(resourceDir, "distribution"), 
+                "myAltDir",
+                new MyMavenProject());
+        packager.execute();
+        Assert.assertTrue(target + " doesn't exist", target.exists());
+    }
+    
+    @Test
     public void targzToTargz() throws Exception {
         File target = new File(tmpDir, "targzToTargz.tar.gz");
         GridlibPackageMojo packager = new GridlibPackageMojo(target, 
-                new File(resourceDir, "test.tar.gz"),
+                new File(resourceDir, "test.tar.gz").getAbsolutePath(),
                 null,
                 null,
                 new File(resourceDir, "distribution"),
@@ -58,7 +83,7 @@ public class GridlibPackageMojoTest {
         
         target = new File(tmpDir, "targzToTargzAlt.tar.gz");
         packager = new GridlibPackageMojo(target, 
-                new File(resourceDir, "test.tar.gz"),
+                new File(resourceDir, "test.tar.gz").getAbsolutePath(),
                 null,
                 null,
                 new File(resourceDir, "distribution"),
@@ -69,7 +94,7 @@ public class GridlibPackageMojoTest {
 
         target = new File(tmpDir, "targzToTargzAlt2.tar.gz");
         packager = new GridlibPackageMojo(target, 
-                new File(resourceDir, "test.tar.gz"),
+                new File(resourceDir, "test.tar.gz").getAbsolutePath(),
                 null,
                 new String[] { "**\\myOldDir\\*" },
                 new File(resourceDir, "distribution"),
@@ -83,7 +108,7 @@ public class GridlibPackageMojoTest {
     public void zipToTargz() throws Exception {
         File target = new File(tmpDir, "zipToTargz.tar.gz");
         GridlibPackageMojo packager = new GridlibPackageMojo(target, 
-                new File(resourceDir, "test.tar.gz"),
+                new File(resourceDir, "test.tar.gz").getAbsolutePath(),
                 null,
                 null,
                 new File(resourceDir, "distribution"),
@@ -94,7 +119,7 @@ public class GridlibPackageMojoTest {
         
         target = new File(tmpDir, "zipToTargzAlt.tar.gz");
         packager = new GridlibPackageMojo(target, 
-                new File(resourceDir, "test.tar.gz"),
+                new File(resourceDir, "test.tar.gz").getAbsolutePath(),
                 null,
                 null,
                 new File(resourceDir, "distribution"),
@@ -105,7 +130,7 @@ public class GridlibPackageMojoTest {
         
         target = new File(tmpDir, "zipToTargzAlt2.tar.gz");
         packager = new GridlibPackageMojo(target, 
-                new File(resourceDir, "test.tar.gz"),
+                new File(resourceDir, "test.tar.gz").getAbsolutePath(),
                 null,
                 new String[] { "**\\myOldDir\\*" },
                 new File(resourceDir, "distribution"),
@@ -119,7 +144,7 @@ public class GridlibPackageMojoTest {
     public void zipToZip() throws Exception {
         File target = new File(tmpDir, "zipToZip.zip");
         GridlibPackageMojo packager = new GridlibPackageMojo(target, 
-                new File(resourceDir, "test.zip"),
+                new File(resourceDir, "test.zip").getAbsolutePath(),
                 null,
                 null,
                 new File(resourceDir, "distribution"),
@@ -130,7 +155,7 @@ public class GridlibPackageMojoTest {
         
         target = new File(tmpDir, "zipToZipAlt.zip");
         packager = new GridlibPackageMojo(target, 
-                new File(resourceDir, "test.zip"),
+                new File(resourceDir, "test.zip").getAbsolutePath(),
                 null,
                 null,
                 new File(resourceDir, "distribution"),
@@ -144,7 +169,7 @@ public class GridlibPackageMojoTest {
     public void dirToZip() throws Exception {
         File target = new File(tmpDir, "dirToZip.zip");
         GridlibPackageMojo packager = new GridlibPackageMojo(target, 
-                new File(resourceDir, "tmp"),
+                new File(resourceDir, "tmp").getAbsolutePath(),
                 null,
                 null,
                 new File(resourceDir, "distribution"),
@@ -159,7 +184,7 @@ public class GridlibPackageMojoTest {
     public void dirToTargz() throws Exception {
         File target = new File(tmpDir, "dirToTargz.tar.gz");
         GridlibPackageMojo packager = new GridlibPackageMojo(target, 
-                new File(resourceDir, "tmp"),
+                new File(resourceDir, "tmp").getAbsolutePath(),
                 null,
                 null,
                 new File(resourceDir, "distribution"),

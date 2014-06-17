@@ -29,7 +29,7 @@ Packages a grid libary given the grid-library.xml resource directory and 3rd par
     <td>distroFilename</td><td>The target name of the distribution grid library.  The extension must be tar.gz or zip.</td><td></td><td>1.0</td>
   </tr>
   <tr>
-    <td>distroSource</td><td>The file or directory that contains the software to bundle.</td><td></td><td>1.0</td>
+    <td>distroSource</td><td>The URL, file or directory that contains the software to bundle.  When specifying an URL, connectionTimeout and readTimeout can be specified for the file download.</td><td></td><td>1.0</td>
   </tr>
   <tr>
     <td>includes</td><td>A set of file patterns to include from the distroSource.</td><td></td><td>1.2-SNAPSHOT</td>
