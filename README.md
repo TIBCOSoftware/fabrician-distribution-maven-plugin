@@ -5,7 +5,7 @@ Distribution Maven Plugin
 
 Maven Plugin for creating distributions and uploading grid libraries to SilverFabric.
 
-Release builds are available from [Maven Central](http://search.maven.org/#search|ga|1|g%3A%22org.fabrician.maven-plugins%22).  The latest release is 1.1.
+Release builds are available from [Maven Central](http://search.maven.org/#artifactdetails|org.fabrician.maven-plugins|distribution-plugin|1.2|maven-plugin).  The latest release is 1.2.
 
 ## Distribution Packaging
 
